@@ -44,11 +44,11 @@ export default function QuickViewModal({ isOpen, onClose, product }: QuickViewMo
   if (!isOpen || !product) return null;
 
   // Get all available images for the product
-  const productImages = [
+  const productImages: string[] = [
     product.image,
     product.hoverImage,
     product.image, // Fallback to main image if no hover
-  ].filter((img, index, self) => img && self.indexOf(img) === index);
+  ].filter((img, index, self): img is string => Boolean(img) && self.indexOf(img) === index);
 
   const handlePreviousImage = () => {
     setCurrentImageIndex((prev) => (prev === 0 ? productImages.length - 1 : prev - 1));
@@ -178,15 +178,17 @@ export default function QuickViewModal({ isOpen, onClose, product }: QuickViewMo
               )}
 
               {/* Main Image */}
-              <div style={{ position: "relative", width: "100%", height: "400px" }}>
-                <Image
-                  src={productImages[currentImageIndex]}
-                  alt={product.name}
-                  fill
-                  style={{ objectFit: "contain" }}
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                />
-              </div>
+              {productImages.length > 0 && productImages[currentImageIndex] && (
+                <div style={{ position: "relative", width: "100%", height: "400px" }}>
+                  <Image
+                    src={productImages[currentImageIndex]}
+                    alt={product.name}
+                    fill
+                    style={{ objectFit: "contain" }}
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                </div>
+              )}
 
               {/* Next Button */}
               {productImages.length > 1 && (

@@ -40,11 +40,11 @@ export default function ProductPage({ params }: ProductPageProps) {
   }
 
   // Get all available images for the product
-  const productImages = [
+  const productImages: string[] = [
     product.image,
     product.hoverImage,
     product.image, // Fallback to main image if no hover
-  ].filter((img, index, self) => img && self.indexOf(img) === index);
+  ].filter((img, index, self): img is string => Boolean(img) && self.indexOf(img) === index);
 
   const handlePreviousImage = () => {
     setCurrentImageIndex((prev) => (prev === 0 ? productImages.length - 1 : prev - 1));
@@ -129,13 +129,15 @@ export default function ProductPage({ params }: ProductPageProps) {
                     )}
 
                     {/* Main Image */}
-                    <Image
-                      src={productImages[currentImageIndex]}
-                      alt={product.name}
-                      fill
-                      style={{ objectFit: "contain" }}
-                      sizes="(max-width: 768px) 100vw, 50vw"
-                    />
+                    {productImages.length > 0 && productImages[currentImageIndex] && (
+                      <Image
+                        src={productImages[currentImageIndex]}
+                        alt={product.name}
+                        fill
+                        style={{ objectFit: "contain" }}
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                      />
+                    )}
 
                     {/* Next Button */}
                     {productImages.length > 1 && (
@@ -570,8 +572,8 @@ export default function ProductPage({ params }: ProductPageProps) {
                           <strong>Amelie T</strong> – March 6, 2025
                         </p>
                         <p style={{ fontFamily: "Raleway, sans-serif", fontSize: "0.9rem", color: "#333", lineHeight: "1.6" }}>
-                          J'adore ce parfum<br />
-                          Je l'utilise depuis sa sortie,je l'ai racheté il y a quelques jours pour l'offrir,
+                          J&apos;adore ce parfum<br />
+                          Je l&apos;utilise depuis sa sortie,je l&apos;ai racheté il y a quelques jours pour l&apos;offrir,
                         </p>
                       </div>
 
@@ -631,7 +633,7 @@ export default function ProductPage({ params }: ProductPageProps) {
                           <strong>Samira R</strong> – April 25, 2025
                         </p>
                         <p style={{ fontFamily: "Raleway, sans-serif", fontSize: "0.9rem", color: "#333", lineHeight: "1.6" }}>
-                          C'est l'une de mes extrais de parfum préférées.
+                          C&apos;est l&apos;une de mes extrais de parfum préférées.
                         </p>
                       </div>
 
@@ -670,7 +672,7 @@ export default function ProductPage({ params }: ProductPageProps) {
                         </p>
                         <p style={{ fontFamily: "Raleway, sans-serif", fontSize: "0.9rem", color: "#333", lineHeight: "1.6" }}>
                           Odeur incroyable<br />
-                          J'ai acheté ce super parfum a ma mère pour Noel ,car elle avait eu un coup de cœur ! Il sent incroyablement bon!
+                          J&apos;ai acheté ce super parfum a ma mère pour Noel ,car elle avait eu un coup de cœur ! Il sent incroyablement bon!
                         </p>
                       </div>
 
@@ -689,7 +691,7 @@ export default function ProductPage({ params }: ProductPageProps) {
                           <strong>Aline V</strong> – May 19, 2025
                         </p>
                         <p style={{ fontFamily: "Raleway, sans-serif", fontSize: "0.9rem", color: "#333", lineHeight: "1.6" }}>
-                          j'aime se parfum je l'avais je commande encore il et super
+                          j&apos;aime se parfum je l&apos;avais je commande encore il et super
                         </p>
                       </div>
 
@@ -709,7 +711,7 @@ export default function ProductPage({ params }: ProductPageProps) {
                         </p>
                         <p style={{ fontFamily: "Raleway, sans-serif", fontSize: "0.9rem", color: "#333", lineHeight: "1.6" }}>
                           Splendide<br />
-                          C'est un parfum sublime et envoûtant, agréable. Il n'est pas imposant.
+                          C&apos;est un parfum sublime et envoûtant, agréable. Il n&apos;est pas imposant.
                         </p>
                       </div>
 
@@ -728,8 +730,8 @@ export default function ProductPage({ params }: ProductPageProps) {
                           <strong>Laure P</strong> – June 12, 2025
                         </p>
                         <p style={{ fontFamily: "Raleway, sans-serif", fontSize: "0.9rem", color: "#333", lineHeight: "1.6" }}>
-                          j'adore ce produit<br />
-                          ma fille me l'a offert pour mon anniversaire et il convient parfaitement à ma peau
+                          j&apos;adore ce produit<br />
+                          ma fille me l&apos;a offert pour mon anniversaire et il convient parfaitement à ma peau
                         </p>
                       </div>
 
@@ -748,8 +750,8 @@ export default function ProductPage({ params }: ProductPageProps) {
                           <strong>Brigitte</strong> – June 16, 2025
                         </p>
                         <p style={{ fontFamily: "Raleway, sans-serif", fontSize: "0.9rem", color: "#333", lineHeight: "1.6" }}>
-                          J'ADORE !<br />
-                          J'ai acheté ce parfum avant Noël je l'adore, il sent très bon et tiens toute la journée
+                          J&apos;ADORE !<br />
+                          J&apos;ai acheté ce parfum avant Noël je l&apos;adore, il sent très bon et tiens toute la journée
                         </p>
                       </div>
 

@@ -1,6 +1,13 @@
 import { Metadata } from "next";
 import { products } from "@/data/products";
 
+// Generate static params for all products (required for static export)
+export async function generateStaticParams() {
+  return products.map((product) => ({
+    slug: product.slug,
+  }));
+}
+
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const product = products.find((p) => p.slug === params.slug);
 

@@ -1,17 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { products } from "@/data/products";
 
-interface SearchPageProps {
-  searchParams: { q?: string };
-}
-
-export default function SearchPage({ searchParams }: SearchPageProps) {
+export default function SearchPage() {
   const [hoveredProduct, setHoveredProduct] = useState<string | null>(null);
-  const query = searchParams.q || "";
+  const [query, setQuery] = useState<string>("");
+
+  useEffect(() => {
+    // Read search query from URL on client side
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      setQuery(params.get("q") || "");
+    }
+  }, []);
   const searchResults = query
     ? products.filter(
         (product) =>

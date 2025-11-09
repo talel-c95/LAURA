@@ -42,6 +42,24 @@ export default function Header() {
     };
   }, [isCartOpen]);
 
+  // Close language dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (isLanguageDropdownOpen && !target.closest('.header-language-dropdown')) {
+        setIsLanguageDropdownOpen(false);
+      }
+    };
+
+    if (isLanguageDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isLanguageDropdownOpen]);
+
   const navLinks = [
     {
       href: "/shop",
@@ -152,6 +170,17 @@ export default function Header() {
                             setIsShopDropdownOpen(!isShopDropdownOpen);
                           }
                         }}
+                        style={{
+                          transition: "color 0.3s ease, text-shadow 0.3s ease",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.color = "var(--luxury-gold)";
+                          e.currentTarget.style.textShadow = "0 0 10px rgba(212, 175, 55, 0.5)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.color = "";
+                          e.currentTarget.style.textShadow = "";
+                        }}
                       >
                         {link.label}
                         {link.hasDropdown && (
@@ -168,7 +197,19 @@ export default function Header() {
                         >
                           {link.children.map((child) => (
                             <li key={child.href} className="shop-dropdown-item" role="menuitem">
-                              <Link href={child.href} className="shop-dropdown-link">
+                              <Link 
+                                href={child.href} 
+                                className="shop-dropdown-link"
+                                style={{
+                                  transition: "color 0.3s ease",
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.color = "var(--luxury-gold)";
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.color = "";
+                                }}
+                              >
                                 {child.label}
                               </Link>
                             </li>
@@ -192,6 +233,17 @@ export default function Header() {
                       }}
                       className="nav-top-link nav-top-not-logged-in is-small"
                       title="Login"
+                      style={{
+                        transition: "color 0.3s ease, text-shadow 0.3s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.color = "var(--luxury-gold)";
+                        e.currentTarget.style.textShadow = "0 0 10px rgba(212, 175, 55, 0.5)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.color = "";
+                        e.currentTarget.style.textShadow = "";
+                      }}
                     >
                       <span>LOGIN</span>
                     </Link>
@@ -206,7 +258,21 @@ export default function Header() {
                       }}
                       className="header-cart-link is-small"
                       title="Cart"
-                      style={{ display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}
+                      style={{ 
+                        display: "flex", 
+                        alignItems: "center", 
+                        justifyContent: "center", 
+                        position: "relative",
+                        transition: "color 0.3s ease, filter 0.3s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.color = "var(--luxury-gold)";
+                        e.currentTarget.style.filter = "drop-shadow(0 0 8px rgba(212, 175, 55, 0.6))";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.color = "";
+                        e.currentTarget.style.filter = "";
+                      }}
                     >
                       <FiShoppingBag size={20} />
                       {getTotalItems() > 0 && (
@@ -251,6 +317,17 @@ export default function Header() {
                           setIsLanguageDropdownOpen(!isLanguageDropdownOpen);
                         }
                       }}
+                      style={{
+                        transition: "color 0.3s ease, text-shadow 0.3s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.color = "var(--luxury-gold)";
+                        e.currentTarget.style.textShadow = "0 0 10px rgba(212, 175, 55, 0.5)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.color = "";
+                        e.currentTarget.style.textShadow = "";
+                      }}
                     >
                       {currentLanguage}{" "}
                       <FiChevronDown size={12} />
@@ -268,6 +345,15 @@ export default function Header() {
                             onClick={() => {
                               setCurrentLanguage(lang.code);
                               setIsLanguageDropdownOpen(false);
+                            }}
+                            style={{
+                              transition: "color 0.3s ease",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.color = "var(--luxury-gold)";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.color = "";
                             }}
                           >
                             {lang.label}
@@ -290,6 +376,15 @@ export default function Header() {
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
+                        transition: "color 0.3s ease, filter 0.3s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.color = "var(--luxury-gold)";
+                        e.currentTarget.style.filter = "drop-shadow(0 0 8px rgba(212, 175, 55, 0.6))";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.color = "";
+                        e.currentTarget.style.filter = "";
                       }}
                     >
                       <FiSearch size={20} />
@@ -298,39 +393,33 @@ export default function Header() {
                 </ul>
               </div>
 
-              {/* Mobile Right Elements */}
+              {/* Mobile Right Elements - Cart only in header */}
               <div className="flex-col show-for-medium flex-right">
                 <ul className="mobile-nav nav nav-right">
-                  <li className="header-search header-search-lightbox has-icon">
-                    <button
-                      onClick={() => setIsSearchOpen(true)}
-                      className="is-small"
-                      aria-label="Search"
-                      style={{
-                        background: "none",
-                        border: "none",
-                        cursor: "pointer",
-                        padding: "0",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <FiSearch size={24} />
-                    </button>
-                  </li>
-                  <li className="has-dropdown header-language-dropdown">
-                    <button>
-                      {currentLanguage}{" "}
-                      <FiChevronDown size={12} style={{ marginLeft: "4px" }} />
-                    </button>
-                  </li>
                   <li className="cart-item has-icon" style={{ position: "relative" }}>
                     <button
                       onClick={() => setIsCartOpen(!isCartOpen)}
                       className="header-cart-link is-small off-canvas-toggle nav-top-link"
                       title="Cart"
-                      style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}
+                      style={{ 
+                        position: "relative", 
+                        display: "flex", 
+                        alignItems: "center", 
+                        justifyContent: "center",
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: "0",
+                        transition: "color 0.3s ease, filter 0.3s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.color = "var(--luxury-gold)";
+                        e.currentTarget.style.filter = "drop-shadow(0 0 8px rgba(212, 175, 55, 0.6))";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.color = "";
+                        e.currentTarget.style.filter = "";
+                      }}
                     >
                       <FiShoppingBag size={24} />
                       {getTotalItems() > 0 && (
@@ -364,6 +453,51 @@ export default function Header() {
           <div className="header-bg-container fill">
             <div className="header-bg-image fill"></div>
             <div className="header-bg-color fill"></div>
+          </div>
+        </div>
+        
+        {/* Mobile Action Buttons Bar - Below Header */}
+        <div className="mobile-action-buttons-bar show-for-medium">
+          <div className="mobile-action-buttons-container">
+            <button
+              onClick={() => setIsSearchOpen(true)}
+              className="mobile-action-button mobile-search-button"
+              aria-label="Search"
+            >
+              <FiSearch size={20} />
+            </button>
+            <div className="has-dropdown header-language-dropdown mobile-button-item">
+              <button
+                className="mobile-action-button mobile-language-button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsLanguageDropdownOpen(!isLanguageDropdownOpen);
+                }}
+              >
+                <span className="mobile-button-text">{currentLanguage}</span>
+                <FiChevronDown size={14} className="mobile-button-icon" />
+              </button>
+              <ul 
+                className={`language-dropdown-menu mobile-language-dropdown ${isLanguageDropdownOpen ? "is-open" : ""}`}
+                role="menu"
+              >
+                {languages.map((lang) => (
+                  <li key={lang.code} className="language-dropdown-item" role="menuitem">
+                    <Link
+                      href={lang.href}
+                      hrefLang={lang.code.toLowerCase()}
+                      className="language-dropdown-link"
+                      onClick={() => {
+                        setCurrentLanguage(lang.code);
+                        setIsLanguageDropdownOpen(false);
+                      }}
+                    >
+                      {lang.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </header>

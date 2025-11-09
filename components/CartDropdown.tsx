@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { FiX } from "react-icons/fi";
 import { useCart } from "@/contexts/CartContext";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface CartDropdownProps {
   isOpen: boolean;
@@ -13,65 +14,112 @@ interface CartDropdownProps {
 export default function CartDropdown({ isOpen, onClose }: CartDropdownProps) {
   const { cartItems, removeFromCart, updateQuantity, getTotalPrice } = useCart();
 
-  if (!isOpen) return null;
+  const backdropVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+    exit: { opacity: 0 },
+  };
+
+  const sidebarVariants = {
+    hidden: { x: "100%" },
+    visible: {
+      x: 0,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 30,
+      },
+    },
+    exit: {
+      x: "100%",
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 30,
+      },
+    },
+  };
 
   return (
-    <>
-      {/* Overlay */}
-      <div
-        className="cart-sidebar-overlay"
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
-          zIndex: 9998,
-          opacity: isOpen ? 1 : 0,
-          visibility: isOpen ? "visible" : "hidden",
-          transition: "opacity 0.3s ease, visibility 0.3s ease",
-        }}
-        onClick={onClose}
-      />
-      {/* Sidebar */}
-      <div
-        className="cart-sidebar"
-        style={{
-          position: "fixed",
-          top: 0,
-          right: 0,
-          width: "400px",
-          height: "100vh",
-          backgroundColor: "#ffffff",
-          boxShadow: "-2px 0 10px rgba(0, 0, 0, 0.1)",
-          zIndex: 9999,
-          transform: isOpen ? "translateX(0)" : "translateX(100%)",
-          transition: "transform 0.3s ease",
-          overflowY: "auto",
-          padding: "30px 20px",
-        }}
-      >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "30px" }}>
-          <h2 style={{ fontFamily: "Montserrat, sans-serif", fontSize: "1.5rem", fontWeight: 400, color: "#1e1e1e", margin: 0, textTransform: "uppercase", letterSpacing: "1px" }}>
-            Cart
-          </h2>
-          <button
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Glassmorphism Overlay */}
+          <motion.div
+            key="backdrop"
+            className="cart-sidebar-overlay"
+            variants={backdropVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
             onClick={onClose}
             style={{
-              background: "none",
-              border: "none",
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: "rgba(0, 0, 0, 0.8)",
+              backdropFilter: "blur(20px) saturate(180%)",
+              WebkitBackdropFilter: "blur(20px) saturate(180%)",
+              zIndex: 9998,
+            }}
+          />
+          {/* Glassmorphism Sidebar */}
+          <motion.div
+            key="sidebar"
+            className="cart-sidebar glassmorphism"
+            variants={sidebarVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            style={{
+              position: "fixed",
+              top: 0,
+              right: 0,
+              width: "400px",
+              height: "100vh",
+              background: "rgba(0, 0, 0, 0.95)",
+              backdropFilter: "blur(30px) saturate(180%)",
+              WebkitBackdropFilter: "blur(30px) saturate(180%)",
+              borderLeft: "1px solid rgba(212, 175, 55, 0.3)",
+              boxShadow: "-2px 0 40px rgba(0, 0, 0, 0.5), 0 0 60px rgba(212, 175, 55, 0.1)",
+              zIndex: 9999,
+              overflowY: "auto",
+              padding: "30px 20px",
+            }}
+          >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "30px" }}>
+          <h2 className="shimmer-text" style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.8rem", fontWeight: 600, color: "var(--luxury-gold)", margin: 0, textTransform: "uppercase", letterSpacing: "2px" }}>
+            Cart
+          </h2>
+          <motion.button
+            onClick={onClose}
+            style={{
+              background: "rgba(212, 175, 55, 0.2)",
+              border: "1px solid rgba(212, 175, 55, 0.5)",
+              borderRadius: "50%",
               cursor: "pointer",
-              padding: "5px",
+              padding: "8px",
+              width: "36px",
+              height: "36px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              color: "var(--luxury-gold)",
             }}
+            whileHover={{
+              background: "rgba(212, 175, 55, 0.4)",
+              scale: 1.1,
+              rotate: 90,
+              boxShadow: "0 0 20px rgba(212, 175, 55, 0.6)",
+            }}
+            whileTap={{ scale: 0.95 }}
           >
-            <FiX size={24} color="#1e1e1e" />
-          </button>
+            <FiX size={20} />
+          </motion.button>
         </div>
-        <div style={{ borderBottom: "1px solid #e0e0e0", marginBottom: "30px" }}></div>
+        <div style={{ borderBottom: "1px solid rgba(212, 175, 55, 0.3)", marginBottom: "30px" }}></div>
         <div className="widget_shopping_cart_content">
           {cartItems.length === 0 ? (
             <div className="ux-mini-cart-empty flex flex-row-col text-center pt pb">
@@ -89,37 +137,47 @@ export default function CartDropdown({ isOpen, onClose }: CartDropdownProps) {
                   />
                 </svg>
               </div>
-              <p className="woocommerce-mini-cart__empty-message empty" style={{ fontFamily: "Raleway, sans-serif", fontSize: "1rem", color: "#666", marginBottom: "20px" }}>
+              <p className="woocommerce-mini-cart__empty-message empty" style={{ fontFamily: "'Poppins', sans-serif", fontSize: "1rem", color: "var(--luxury-text)", marginBottom: "20px" }}>
                 No products in the cart.
               </p>
               <p className="return-to-shop">
-                <Link 
-                  className="button primary wc-backward" 
-                  href="/shop"
-                  onClick={onClose}
-                  style={{
-                    display: "inline-block",
-                    padding: "12px 30px",
-                    backgroundColor: "#1e1e1e",
-                    color: "#ffffff",
-                    textDecoration: "none",
-                    fontFamily: "Montserrat, sans-serif",
-                    fontSize: "0.9rem",
-                    textTransform: "uppercase",
-                    letterSpacing: "1px",
-                    fontWeight: 400,
-                    borderRadius: "2px",
-                    transition: "background-color 0.3s ease",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = "#333";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = "#1e1e1e";
-                  }}
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  Return to shop
-                </Link>
+                  <Link 
+                    className="button primary wc-backward glow-gold" 
+                    href="/shop"
+                    onClick={onClose}
+                    style={{
+                      display: "inline-block",
+                      padding: "14px 32px",
+                      background: "transparent",
+                      border: "2px solid var(--luxury-gold)",
+                      color: "var(--luxury-gold)",
+                      textDecoration: "none",
+                      fontFamily: "'Poppins', sans-serif",
+                      fontSize: "0.9rem",
+                      textTransform: "uppercase",
+                      letterSpacing: "1px",
+                      fontWeight: 600,
+                      borderRadius: "4px",
+                      transition: "all 0.3s ease",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = "var(--luxury-gold)";
+                      e.currentTarget.style.color = "var(--luxury-black)";
+                      e.currentTarget.style.boxShadow = "0 0 20px rgba(212, 175, 55, 0.6)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = "transparent";
+                      e.currentTarget.style.color = "var(--luxury-gold)";
+                      e.currentTarget.style.boxShadow = "none";
+                    }}
+                  >
+                    Return to shop
+                  </Link>
+                </motion.div>
               </p>
             </div>
           ) : (
@@ -287,8 +345,10 @@ export default function CartDropdown({ isOpen, onClose }: CartDropdownProps) {
             </>
           )}
         </div>
-      </div>
-    </>
+      </motion.div>
+        </>
+      )}
+    </AnimatePresence>
   );
 }
 

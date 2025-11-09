@@ -6,6 +6,7 @@ import { FiSearch, FiX } from "react-icons/fi";
 import { products } from "@/data/products";
 import Image from "next/image";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface SearchLightboxProps {
   isOpen: boolean;
@@ -83,11 +84,54 @@ export default function SearchLightbox({ isOpen, onClose }: SearchLightboxProps)
     }
   };
 
-  if (!isOpen) return null;
+  const backdropVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+    exit: { opacity: 0 },
+  };
+
+  const contentVariants = {
+    hidden: { y: -100, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 30,
+      },
+    },
+    exit: {
+      y: -100,
+      opacity: 0,
+      transition: {
+        duration: 0.3,
+      },
+    },
+  };
+
+  const resultsVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        staggerChildren: 0.05,
+        delayChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0 },
+  };
 
   return (
-    <>
-      <style dangerouslySetInnerHTML={{__html: `
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          <style dangerouslySetInnerHTML={{__html: `
         @keyframes fadeIn {
           from {
             opacity: 0;
@@ -159,35 +203,50 @@ export default function SearchLightbox({ isOpen, onClose }: SearchLightboxProps)
           }
         }
       `}} />
-      <div
-        className="search-overlay-backdrop"
-        style={{
-          height: "100vh",
-          width: "100vw",
-          position: "fixed",
-          zIndex: 10000,
-          top: 0,
-          left: 0,
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
-          backdropFilter: "blur(4px)",
-          WebkitBackdropFilter: "blur(4px)",
-        }}
-      >
-        {/* Search Content - Full Width Bar at Top */}
-        <div
-          className="search-overlay-content"
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            width: "100%",
-            backgroundColor: "#ffffff",
-            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
-            padding: "20px 0",
-            zIndex: 10001,
-          }}
-        >
+          <motion.div
+            key="backdrop"
+            className="search-overlay-backdrop"
+            variants={backdropVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            onClick={onClose}
+            style={{
+              height: "100vh",
+              width: "100vw",
+              position: "fixed",
+              zIndex: 10000,
+              top: 0,
+              left: 0,
+              background: "rgba(0, 0, 0, 0.8)",
+              backdropFilter: "blur(20px) saturate(180%)",
+              WebkitBackdropFilter: "blur(20px) saturate(180%)",
+            }}
+          />
+          
+          {/* Search Content - Full Width Bar at Top */}
+          <motion.div
+            key="content"
+            className="search-overlay-content glassmorphism"
+            variants={contentVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              width: "100%",
+              background: "rgba(0, 0, 0, 0.95)",
+              backdropFilter: "blur(30px) saturate(180%)",
+              WebkitBackdropFilter: "blur(30px) saturate(180%)",
+              borderBottom: "1px solid rgba(212, 175, 55, 0.3)",
+              boxShadow: "0 4px 40px rgba(0, 0, 0, 0.5), 0 0 60px rgba(212, 175, 55, 0.1)",
+              padding: "30px 0",
+              zIndex: 10001,
+            }}
+          >
           <div
             style={{
               maxWidth: "1200px",
@@ -220,86 +279,94 @@ export default function SearchLightbox({ isOpen, onClose }: SearchLightboxProps)
                 className="search-input search-overlay-input"
                 style={{
                   flex: 1,
-                  padding: "15px 20px",
-                  fontSize: "16px",
-                  border: "1px solid #e0e0e0",
-                  borderRadius: "4px",
-                  background: "#ffffff",
+                  padding: "18px 24px",
+                  fontSize: "18px",
+                  border: "2px solid rgba(212, 175, 55, 0.3)",
+                  borderRadius: "8px",
+                  background: "rgba(255, 255, 255, 0.1)",
+                  backdropFilter: "blur(10px)",
+                  WebkitBackdropFilter: "blur(10px)",
                   outline: "none",
-                  color: "#1e1e1e",
-                  transition: "all 0.2s ease",
-                  fontFamily: "Raleway, sans-serif",
+                  color: "var(--luxury-text)",
+                  transition: "all 0.3s ease",
+                  fontFamily: "'Poppins', sans-serif",
                 }}
                 onFocus={(e) => {
-                  e.currentTarget.style.borderColor = "#1e1e1e";
+                  e.currentTarget.style.borderColor = "var(--luxury-gold)";
+                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.15)";
+                  e.currentTarget.style.boxShadow = "0 0 20px rgba(212, 175, 55, 0.3)";
                 }}
                 onBlur={(e) => {
-                  e.currentTarget.style.borderColor = "#e0e0e0";
+                  e.currentTarget.style.borderColor = "rgba(212, 175, 55, 0.3)";
+                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
+                  e.currentTarget.style.boxShadow = "none";
                 }}
               />
               <input type="hidden" name="post_type" value="product" />
-              <button
+              <motion.button
                 type="submit"
-                className="search-submit-btn search-overlay-submit"
+                className="search-submit-btn search-overlay-submit glow-gold"
                 aria-label="Search"
                 style={{
-                  padding: "15px 25px",
-                  background: "#1e1e1e",
+                  padding: "18px 30px",
+                  background: "transparent",
                   fontSize: "16px",
-                  border: "none",
-                  borderRadius: "4px",
+                  border: "2px solid var(--luxury-gold)",
+                  borderRadius: "8px",
                   cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  color: "#ffffff",
-                  transition: "all 0.2s ease",
-                  fontWeight: 500,
+                  color: "var(--luxury-gold)",
+                  transition: "all 0.3s ease",
+                  fontWeight: 600,
+                  fontFamily: "'Poppins', sans-serif",
+                  textTransform: "uppercase",
+                  letterSpacing: "1px",
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "#0a0a0a";
+                whileHover={{
+                  background: "var(--luxury-gold)",
+                  color: "var(--luxury-black)",
+                  scale: 1.05,
                 }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "#1e1e1e";
-                }}
+                whileTap={{ scale: 0.95 }}
               >
-                <FiSearch size={18} style={{ color: "#ffffff" }} />
-              </button>
+                <FiSearch size={20} style={{ marginRight: "8px" }} />
+                Search
+              </motion.button>
             </form>
 
             {/* Close Button */}
-            <button
+            <motion.button
               className="search-close-btn"
               onClick={onClose}
               title="Close Search (ESC)"
               aria-label="Close search overlay"
               style={{
-                background: "transparent",
-                border: "none",
+                background: "rgba(212, 175, 55, 0.2)",
+                border: "1px solid rgba(212, 175, 55, 0.5)",
+                borderRadius: "50%",
                 cursor: "pointer",
-                color: "#1e1e1e",
-                padding: "8px",
+                color: "var(--luxury-gold)",
+                padding: "12px",
+                width: "44px",
+                height: "44px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                borderRadius: "4px",
-                width: "40px",
-                height: "40px",
-                transition: "all 0.2s ease",
-                fontSize: "24px",
-                lineHeight: 1,
+                transition: "all 0.3s ease",
               }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#f5f5f5";
+              whileHover={{
+                background: "rgba(212, 175, 55, 0.4)",
+                scale: 1.1,
+                rotate: 90,
+                boxShadow: "0 0 20px rgba(212, 175, 55, 0.6)",
               }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "transparent";
-              }}
+              whileTap={{ scale: 0.95 }}
             >
               <FiX size={24} />
-            </button>
+            </motion.button>
           </div>
-        </div>
 
         {/* Search Results Dropdown */}
         {searchQuery.trim().length > 0 && (
@@ -457,8 +524,10 @@ export default function SearchLightbox({ isOpen, onClose }: SearchLightboxProps)
             </div>
           </div>
         )}
-      </div>
-    </>
+        </motion.div>
+      </>
+      )}
+    </AnimatePresence>
   );
 }
 

@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { FiX } from "react-icons/fi";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -33,432 +34,556 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     return () => document.removeEventListener("keydown", handleEscape);
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
+  const backdropVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+    exit: { opacity: 0 },
+  };
+
+  const modalVariants = {
+    hidden: { opacity: 0, scale: 0.95 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 30,
+      },
+    },
+    exit: {
+      opacity: 0,
+      scale: 0.95,
+      transition: {
+        duration: 0.2,
+      },
+    },
+  };
 
   return (
-    <>
-      {/* Overlay */}
-      <div
-        className="login-modal-overlay"
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
-          zIndex: 10000,
-          opacity: isOpen ? 1 : 0,
-          visibility: isOpen ? "visible" : "hidden",
-          transition: "opacity 0.3s ease, visibility 0.3s ease",
-        }}
-        onClick={onClose}
-      />
-      {/* Modal */}
-      <div
-        ref={modalRef}
-        className="login-modal"
-        style={{
-          position: "fixed",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: "90%",
-          maxWidth: "900px",
-          backgroundColor: "#ffffff",
-          borderRadius: "4px",
-          zIndex: 10001,
-          opacity: isOpen ? 1 : 0,
-          visibility: isOpen ? "visible" : "hidden",
-          transition: "opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease",
-          maxHeight: "90vh",
-          overflowY: "auto",
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <button
-          onClick={onClose}
-          style={{
-            position: "absolute",
-            top: "20px",
-            right: "20px",
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            padding: "5px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 10002,
-          }}
-        >
-          <FiX size={24} color="#1e1e1e" />
-        </button>
-
-        <div
-          className="login-modal-content"
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            minHeight: "500px",
-          }}
-        >
-          {/* Left Section - LOGIN */}
-          <div
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Glassmorphism Overlay */}
+          <motion.div
+            key="backdrop"
+            className="login-modal-overlay"
+            variants={backdropVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            onClick={onClose}
             style={{
-              flex: 1,
-              padding: "60px 50px",
-              borderRight: "1px solid #e0e0e0",
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: "rgba(0, 0, 0, 0.85)",
+              backdropFilter: "blur(20px) saturate(180%)",
+              WebkitBackdropFilter: "blur(20px) saturate(180%)",
+              zIndex: 10000,
             }}
+          />
+          {/* Glassmorphism Modal */}
+          <motion.div
+            key="modal"
+            ref={modalRef}
+            className="login-modal glassmorphism"
+            style={{
+              position: "fixed",
+              top: "50%",
+              left: "50%",
+              width: "90%",
+              maxWidth: "1000px",
+              background: "rgba(0, 0, 0, 0.98)",
+              backdropFilter: "blur(40px) saturate(180%)",
+              WebkitBackdropFilter: "blur(40px) saturate(180%)",
+              border: "1px solid rgba(212, 175, 55, 0.2)",
+              borderRadius: "16px",
+              boxShadow: "0 25px 80px rgba(0, 0, 0, 0.6), 0 0 80px rgba(212, 175, 55, 0.15)",
+              zIndex: 10001,
+              maxHeight: "90vh",
+              overflowY: "auto",
+            }}
+            initial={{ opacity: 0, scale: 0.95, x: "-50%", y: "-50%" }}
+            animate={{ opacity: 1, scale: 1, x: "-50%", y: "-50%" }}
+            exit={{ opacity: 0, scale: 0.95, x: "-50%", y: "-50%" }}
+            onClick={(e) => e.stopPropagation()}
           >
-            <h2
+            <motion.button
+              onClick={onClose}
               style={{
-                fontFamily: "Montserrat, sans-serif",
-                fontSize: "1.8rem",
-                fontWeight: 400,
-                color: "#1e1e1e",
-                margin: "0 0 30px 0",
-                textTransform: "uppercase",
-                letterSpacing: "1px",
+                position: "absolute",
+                top: "24px",
+                right: "24px",
+                background: "rgba(212, 175, 55, 0.15)",
+                border: "1px solid rgba(212, 175, 55, 0.4)",
+                borderRadius: "50%",
+                cursor: "pointer",
+                padding: "12px",
+                width: "44px",
+                height: "44px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                zIndex: 10002,
+                color: "var(--luxury-gold)",
+                transition: "all 0.3s ease",
+              }}
+              whileHover={{
+                background: "rgba(212, 175, 55, 0.3)",
+                scale: 1.1,
+                rotate: 90,
+                boxShadow: "0 0 25px rgba(212, 175, 55, 0.7)",
+              }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <FiX size={22} />
+            </motion.button>
+
+            <div
+              className="login-modal-content"
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                minHeight: "600px",
               }}
             >
-              LOGIN
-            </h2>
-
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                // Handle login logic here
-              }}
-            >
-              <div style={{ marginBottom: "20px" }}>
-                <label
-                  htmlFor="username"
-                  style={{
-                    display: "block",
-                    fontFamily: "Raleway, sans-serif",
-                    fontSize: "0.9rem",
-                    color: "#333",
-                    marginBottom: "8px",
-                    fontWeight: 400,
-                  }}
-                >
-                  Username or email address *
-                </label>
-                <input
-                  type="text"
-                  id="username"
-                  name="username"
-                  required
-                  style={{
-                    width: "100%",
-                    padding: "12px 15px",
-                    border: "1px solid #e0e0e0",
-                    borderRadius: "0",
-                    fontFamily: "Raleway, sans-serif",
-                    fontSize: "0.95rem",
-                    color: "#333",
-                    backgroundColor: "#ffffff",
-                    outline: "none",
-                    transition: "border-color 0.3s ease",
-                  }}
-                  onFocus={(e) => (e.target.style.borderColor = "#1e1e1e")}
-                  onBlur={(e) => (e.target.style.borderColor = "#e0e0e0")}
-                />
-              </div>
-
-              <div style={{ marginBottom: "20px" }}>
-                <label
-                  htmlFor="password"
-                  style={{
-                    display: "block",
-                    fontFamily: "Raleway, sans-serif",
-                    fontSize: "0.9rem",
-                    color: "#333",
-                    marginBottom: "8px",
-                    fontWeight: 400,
-                  }}
-                >
-                  Password *
-                </label>
-                <input
-                  type="password"
-                  id="password"
-                  name="password"
-                  required
-                  style={{
-                    width: "100%",
-                    padding: "12px 15px",
-                    border: "1px solid #e0e0e0",
-                    borderRadius: "0",
-                    fontFamily: "Raleway, sans-serif",
-                    fontSize: "0.95rem",
-                    color: "#333",
-                    backgroundColor: "#ffffff",
-                    outline: "none",
-                    transition: "border-color 0.3s ease",
-                  }}
-                  onFocus={(e) => (e.target.style.borderColor = "#1e1e1e")}
-                  onBlur={(e) => (e.target.style.borderColor = "#e0e0e0")}
-                />
-              </div>
-
-              <div style={{ marginBottom: "25px", display: "flex", alignItems: "center" }}>
-                <input
-                  type="checkbox"
-                  id="remember"
-                  name="remember"
-                  style={{
-                    marginRight: "8px",
-                    width: "16px",
-                    height: "16px",
-                    cursor: "pointer",
-                  }}
-                />
-                <label
-                  htmlFor="remember"
-                  style={{
-                    fontFamily: "Raleway, sans-serif",
-                    fontSize: "0.9rem",
-                    color: "#333",
-                    cursor: "pointer",
-                    fontWeight: 400,
-                  }}
-                >
-                  Remember me
-                </label>
-              </div>
-
-              <button
-                type="submit"
+              {/* Left Section - LOGIN */}
+              <div
                 style={{
-                  width: "100%",
-                  padding: "14px 20px",
-                  backgroundColor: "#1e1e1e",
-                  color: "#ffffff",
-                  border: "none",
-                  borderRadius: "0",
-                  fontFamily: "Montserrat, sans-serif",
-                  fontSize: "0.9rem",
-                  textTransform: "uppercase",
-                  letterSpacing: "1px",
-                  fontWeight: 400,
-                  cursor: "pointer",
-                  transition: "background-color 0.3s ease",
-                  marginBottom: "15px",
+                  flex: 1,
+                  padding: "60px 50px",
+                  borderRight: "1px solid rgba(212, 175, 55, 0.15)",
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#333")}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#1e1e1e")}
               >
-                Log in
-              </button>
-
-              <div>
-                <Link
-                  href="/lost-password"
-                  style={{
-                    fontFamily: "Raleway, sans-serif",
-                    fontSize: "0.9rem",
-                    color: "#333",
-                    textDecoration: "none",
-                    fontWeight: 400,
-                  }}
-                  onClick={onClose}
-                >
-                  Lost your password?
-                </Link>
-              </div>
-            </form>
-          </div>
-
-          {/* Right Section - REGISTER */}
-          <div
-            style={{
-              flex: 1,
-              padding: "60px 50px",
-            }}
-          >
-            <h2
-              style={{
-                fontFamily: "Montserrat, sans-serif",
-                fontSize: "1.8rem",
-                fontWeight: 400,
-                color: "#1e1e1e",
-                margin: "0 0 30px 0",
-                textTransform: "uppercase",
-                letterSpacing: "1px",
-              }}
-            >
-              REGISTER
-            </h2>
-
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                // Handle registration logic here
-              }}
-            >
-              <div style={{ marginBottom: "20px" }}>
-                <label
-                  htmlFor="reg-username"
-                  style={{
-                    display: "block",
-                    fontFamily: "Raleway, sans-serif",
-                    fontSize: "0.9rem",
-                    color: "#333",
-                    marginBottom: "8px",
-                    fontWeight: 400,
+                <h2 className="shimmer-text" style={{
+                    fontFamily: "'Playfair Display', serif",
+                    fontSize: "2.5rem",
+                    fontWeight: 700,
+                    color: "var(--luxury-gold)",
+                    margin: "0 0 40px 0",
+                    textTransform: "uppercase",
+                    letterSpacing: "3px",
                   }}
                 >
-                  Username *
-                </label>
-                <input
-                  type="text"
-                  id="reg-username"
-                  name="reg-username"
-                  required
-                  style={{
-                    width: "100%",
-                    padding: "12px 15px",
-                    border: "1px solid #e0e0e0",
-                    borderRadius: "0",
-                    fontFamily: "Raleway, sans-serif",
-                    fontSize: "0.95rem",
-                    color: "#333",
-                    backgroundColor: "#ffffff",
-                    outline: "none",
-                    transition: "border-color 0.3s ease",
-                  }}
-                  onFocus={(e) => (e.target.style.borderColor = "#1e1e1e")}
-                  onBlur={(e) => (e.target.style.borderColor = "#e0e0e0")}
-                />
-              </div>
+                  Login
+                </h2>
 
-              <div style={{ marginBottom: "20px" }}>
-                <label
-                  htmlFor="reg-email"
-                  style={{
-                    display: "block",
-                    fontFamily: "Raleway, sans-serif",
-                    fontSize: "0.9rem",
-                    color: "#333",
-                    marginBottom: "8px",
-                    fontWeight: 400,
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    // Handle login logic here
                   }}
                 >
-                  Email address *
-                </label>
-                <input
-                  type="email"
-                  id="reg-email"
-                  name="reg-email"
-                  required
-                  style={{
-                    width: "100%",
-                    padding: "12px 15px",
-                    border: "1px solid #e0e0e0",
-                    borderRadius: "0",
-                    fontFamily: "Raleway, sans-serif",
-                    fontSize: "0.95rem",
-                    color: "#333",
-                    backgroundColor: "#ffffff",
-                    outline: "none",
-                    transition: "border-color 0.3s ease",
-                  }}
-                  onFocus={(e) => (e.target.style.borderColor = "#1e1e1e")}
-                  onBlur={(e) => (e.target.style.borderColor = "#e0e0e0")}
-                />
-              </div>
+                  <div style={{ marginBottom: "24px" }}>
+                    <label
+                      htmlFor="username"
+                      style={{
+                        display: "block",
+                        fontFamily: "'Poppins', sans-serif",
+                        fontSize: "0.9rem",
+                        color: "rgba(255, 255, 255, 0.8)",
+                        marginBottom: "10px",
+                        fontWeight: 500,
+                        textTransform: "uppercase",
+                        letterSpacing: "1px",
+                      }}
+                    >
+                      Username or Email *
+                    </label>
+                    <input
+                      type="text"
+                      id="username"
+                      name="username"
+                      required
+                      style={{
+                        width: "100%",
+                        padding: "16px 20px",
+                        border: "2px solid rgba(212, 175, 55, 0.3)",
+                        borderRadius: "8px",
+                        fontFamily: "'Poppins', sans-serif",
+                        fontSize: "1rem",
+                        color: "rgba(255, 255, 255, 0.95)",
+                        background: "rgba(255, 255, 255, 0.05)",
+                        backdropFilter: "blur(10px)",
+                        WebkitBackdropFilter: "blur(10px)",
+                        outline: "none",
+                        transition: "all 0.3s ease",
+                      }}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = "var(--luxury-gold)";
+                        e.target.style.background = "rgba(255, 255, 255, 0.08)";
+                        e.target.style.boxShadow = "0 0 25px rgba(212, 175, 55, 0.4)";
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = "rgba(212, 175, 55, 0.3)";
+                        e.target.style.background = "rgba(255, 255, 255, 0.05)";
+                        e.target.style.boxShadow = "none";
+                      }}
+                    />
+                  </div>
 
-              <div style={{ marginBottom: "20px" }}>
-                <label
-                  htmlFor="reg-password"
-                  style={{
-                    display: "block",
-                    fontFamily: "Raleway, sans-serif",
-                    fontSize: "0.9rem",
-                    color: "#333",
-                    marginBottom: "8px",
-                    fontWeight: 400,
-                  }}
-                >
-                  Password *
-                </label>
-                <input
-                  type="password"
-                  id="reg-password"
-                  name="reg-password"
-                  required
-                  style={{
-                    width: "100%",
-                    padding: "12px 15px",
-                    border: "1px solid #e0e0e0",
-                    borderRadius: "0",
-                    fontFamily: "Raleway, sans-serif",
-                    fontSize: "0.95rem",
-                    color: "#333",
-                    backgroundColor: "#ffffff",
-                    outline: "none",
-                    transition: "border-color 0.3s ease",
-                  }}
-                  onFocus={(e) => (e.target.style.borderColor = "#1e1e1e")}
-                  onBlur={(e) => (e.target.style.borderColor = "#e0e0e0")}
-                />
-              </div>
+                  <div style={{ marginBottom: "24px" }}>
+                    <label
+                      htmlFor="password"
+                      style={{
+                        display: "block",
+                        fontFamily: "'Poppins', sans-serif",
+                        fontSize: "0.9rem",
+                        color: "rgba(255, 255, 255, 0.8)",
+                        marginBottom: "10px",
+                        fontWeight: 500,
+                        textTransform: "uppercase",
+                        letterSpacing: "1px",
+                      }}
+                    >
+                      Password *
+                    </label>
+                    <input
+                      type="password"
+                      id="password"
+                      name="password"
+                      required
+                      style={{
+                        width: "100%",
+                        padding: "16px 20px",
+                        border: "2px solid rgba(212, 175, 55, 0.3)",
+                        borderRadius: "8px",
+                        fontFamily: "'Poppins', sans-serif",
+                        fontSize: "1rem",
+                        color: "rgba(255, 255, 255, 0.95)",
+                        background: "rgba(255, 255, 255, 0.05)",
+                        backdropFilter: "blur(10px)",
+                        WebkitBackdropFilter: "blur(10px)",
+                        outline: "none",
+                        transition: "all 0.3s ease",
+                      }}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = "var(--luxury-gold)";
+                        e.target.style.background = "rgba(255, 255, 255, 0.08)";
+                        e.target.style.boxShadow = "0 0 25px rgba(212, 175, 55, 0.4)";
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = "rgba(212, 175, 55, 0.3)";
+                        e.target.style.background = "rgba(255, 255, 255, 0.05)";
+                        e.target.style.boxShadow = "none";
+                      }}
+                    />
+                  </div>
 
-              <div style={{ marginBottom: "25px" }}>
-                <p
-                  style={{
-                    fontFamily: "Raleway, sans-serif",
-                    fontSize: "0.85rem",
-                    color: "#666",
-                    lineHeight: "1.6",
-                    margin: 0,
-                    fontWeight: 400,
-                  }}
-                >
-                  Your personal data will be used to support your experience throughout this website, to manage access to your account, and for other purposes described in our{" "}
-                  <Link
-                    href="/privacy-policy"
+                  <div style={{ marginBottom: "30px", display: "flex", alignItems: "center" }}>
+                    <input
+                      type="checkbox"
+                      id="remember"
+                      name="remember"
+                      style={{
+                        marginRight: "10px",
+                        width: "18px",
+                        height: "18px",
+                        cursor: "pointer",
+                        accentColor: "var(--luxury-gold)",
+                      }}
+                    />
+                    <label
+                      htmlFor="remember"
+                      style={{
+                        fontFamily: "'Poppins', sans-serif",
+                        fontSize: "0.9rem",
+                        color: "rgba(255, 255, 255, 0.7)",
+                        cursor: "pointer",
+                        fontWeight: 400,
+                      }}
+                    >
+                      Remember me
+                    </label>
+                  </div>
+
+                  <motion.button
+                    type="submit"
+                    className="glow-gold ripple-effect"
                     style={{
-                      color: "#333",
-                      textDecoration: "underline",
+                      width: "100%",
+                      padding: "18px 30px",
+                      background: "transparent",
+                      border: "2px solid var(--luxury-gold)",
+                      color: "var(--luxury-gold)",
+                      borderRadius: "8px",
+                      fontFamily: "'Poppins', sans-serif",
+                      fontSize: "1rem",
+                      textTransform: "uppercase",
+                      letterSpacing: "2px",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      transition: "all 0.3s ease",
+                      marginBottom: "20px",
                     }}
-                    onClick={onClose}
+                    whileHover={{
+                      background: "var(--luxury-gold)",
+                      color: "var(--luxury-black)",
+                      scale: 1.02,
+                      boxShadow: "0 0 30px rgba(212, 175, 55, 0.6)",
+                    }}
+                    whileTap={{ scale: 0.98 }}
                   >
-                    privacy policy
-                  </Link>
-                  .
-                </p>
+                    Log In
+                  </motion.button>
+
+                  <div>
+                    <Link
+                      href="/lost-password"
+                      style={{
+                        fontFamily: "'Poppins', sans-serif",
+                        fontSize: "0.9rem",
+                        color: "rgba(255, 255, 255, 0.7)",
+                        textDecoration: "none",
+                        fontWeight: 400,
+                        transition: "color 0.3s ease",
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = "var(--luxury-gold)"}
+                      onMouseLeave={(e) => e.currentTarget.style.color = "rgba(255, 255, 255, 0.7)"}
+                      onClick={onClose}
+                    >
+                      Lost your password?
+                    </Link>
+                  </div>
+                </form>
               </div>
 
-              <button
-                type="submit"
+              {/* Right Section - REGISTER */}
+              <div
                 style={{
-                  width: "100%",
-                  padding: "14px 20px",
-                  backgroundColor: "#1e1e1e",
-                  color: "#ffffff",
-                  border: "none",
-                  borderRadius: "0",
-                  fontFamily: "Montserrat, sans-serif",
-                  fontSize: "0.9rem",
-                  textTransform: "uppercase",
-                  letterSpacing: "1px",
-                  fontWeight: 400,
-                  cursor: "pointer",
-                  transition: "background-color 0.3s ease",
+                  flex: 1,
+                  padding: "60px 50px",
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#333")}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#1e1e1e")}
               >
-                Register
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
-    </>
+                <h2 className="shimmer-text" style={{
+                    fontFamily: "'Playfair Display', serif",
+                    fontSize: "2.5rem",
+                    fontWeight: 700,
+                    color: "var(--luxury-gold)",
+                    margin: "0 0 40px 0",
+                    textTransform: "uppercase",
+                    letterSpacing: "3px",
+                  }}
+                >
+                  Register
+                </h2>
+
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    // Handle registration logic here
+                  }}
+                >
+                  <div style={{ marginBottom: "24px" }}>
+                    <label
+                      htmlFor="reg-username"
+                      style={{
+                        display: "block",
+                        fontFamily: "'Poppins', sans-serif",
+                        fontSize: "0.9rem",
+                        color: "rgba(255, 255, 255, 0.8)",
+                        marginBottom: "10px",
+                        fontWeight: 500,
+                        textTransform: "uppercase",
+                        letterSpacing: "1px",
+                      }}
+                    >
+                      Username *
+                    </label>
+                    <input
+                      type="text"
+                      id="reg-username"
+                      name="reg-username"
+                      required
+                      style={{
+                        width: "100%",
+                        padding: "16px 20px",
+                        border: "2px solid rgba(212, 175, 55, 0.3)",
+                        borderRadius: "8px",
+                        fontFamily: "'Poppins', sans-serif",
+                        fontSize: "1rem",
+                        color: "rgba(255, 255, 255, 0.95)",
+                        background: "rgba(255, 255, 255, 0.05)",
+                        backdropFilter: "blur(10px)",
+                        WebkitBackdropFilter: "blur(10px)",
+                        outline: "none",
+                        transition: "all 0.3s ease",
+                      }}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = "var(--luxury-gold)";
+                        e.target.style.background = "rgba(255, 255, 255, 0.08)";
+                        e.target.style.boxShadow = "0 0 25px rgba(212, 175, 55, 0.4)";
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = "rgba(212, 175, 55, 0.3)";
+                        e.target.style.background = "rgba(255, 255, 255, 0.05)";
+                        e.target.style.boxShadow = "none";
+                      }}
+                    />
+                  </div>
+
+                  <div style={{ marginBottom: "24px" }}>
+                    <label
+                      htmlFor="reg-email"
+                      style={{
+                        display: "block",
+                        fontFamily: "'Poppins', sans-serif",
+                        fontSize: "0.9rem",
+                        color: "rgba(255, 255, 255, 0.8)",
+                        marginBottom: "10px",
+                        fontWeight: 500,
+                        textTransform: "uppercase",
+                        letterSpacing: "1px",
+                      }}
+                    >
+                      Email Address *
+                    </label>
+                    <input
+                      type="email"
+                      id="reg-email"
+                      name="reg-email"
+                      required
+                      style={{
+                        width: "100%",
+                        padding: "16px 20px",
+                        border: "2px solid rgba(212, 175, 55, 0.3)",
+                        borderRadius: "8px",
+                        fontFamily: "'Poppins', sans-serif",
+                        fontSize: "1rem",
+                        color: "rgba(255, 255, 255, 0.95)",
+                        background: "rgba(255, 255, 255, 0.05)",
+                        backdropFilter: "blur(10px)",
+                        WebkitBackdropFilter: "blur(10px)",
+                        outline: "none",
+                        transition: "all 0.3s ease",
+                      }}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = "var(--luxury-gold)";
+                        e.target.style.background = "rgba(255, 255, 255, 0.08)";
+                        e.target.style.boxShadow = "0 0 25px rgba(212, 175, 55, 0.4)";
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = "rgba(212, 175, 55, 0.3)";
+                        e.target.style.background = "rgba(255, 255, 255, 0.05)";
+                        e.target.style.boxShadow = "none";
+                      }}
+                    />
+                  </div>
+
+                  <div style={{ marginBottom: "24px" }}>
+                    <label
+                      htmlFor="reg-password"
+                      style={{
+                        display: "block",
+                        fontFamily: "'Poppins', sans-serif",
+                        fontSize: "0.9rem",
+                        color: "rgba(255, 255, 255, 0.8)",
+                        marginBottom: "10px",
+                        fontWeight: 500,
+                        textTransform: "uppercase",
+                        letterSpacing: "1px",
+                      }}
+                    >
+                      Password *
+                    </label>
+                    <input
+                      type="password"
+                      id="reg-password"
+                      name="reg-password"
+                      required
+                      style={{
+                        width: "100%",
+                        padding: "16px 20px",
+                        border: "2px solid rgba(212, 175, 55, 0.3)",
+                        borderRadius: "8px",
+                        fontFamily: "'Poppins', sans-serif",
+                        fontSize: "1rem",
+                        color: "rgba(255, 255, 255, 0.95)",
+                        background: "rgba(255, 255, 255, 0.05)",
+                        backdropFilter: "blur(10px)",
+                        WebkitBackdropFilter: "blur(10px)",
+                        outline: "none",
+                        transition: "all 0.3s ease",
+                      }}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = "var(--luxury-gold)";
+                        e.target.style.background = "rgba(255, 255, 255, 0.08)";
+                        e.target.style.boxShadow = "0 0 25px rgba(212, 175, 55, 0.4)";
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = "rgba(212, 175, 55, 0.3)";
+                        e.target.style.background = "rgba(255, 255, 255, 0.05)";
+                        e.target.style.boxShadow = "none";
+                      }}
+                    />
+                  </div>
+
+                  <div style={{ marginBottom: "30px" }}>
+                    <p
+                      style={{
+                        fontFamily: "'Poppins', sans-serif",
+                        fontSize: "0.85rem",
+                        color: "rgba(255, 255, 255, 0.6)",
+                        lineHeight: "1.6",
+                        margin: 0,
+                        fontWeight: 400,
+                      }}
+                    >
+                      Your personal data will be used to support your experience throughout this website, to manage access to your account, and for other purposes described in our{" "}
+                      <Link
+                        href="/privacy-policy"
+                        style={{
+                          color: "var(--luxury-gold)",
+                          textDecoration: "underline",
+                          transition: "color 0.3s ease",
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.color = "var(--luxury-gold-light)"}
+                        onMouseLeave={(e) => e.currentTarget.style.color = "var(--luxury-gold)"}
+                        onClick={onClose}
+                      >
+                        privacy policy
+                      </Link>
+                      .
+                    </p>
+                  </div>
+
+                  <motion.button
+                    type="submit"
+                    className="glow-gold ripple-effect"
+                    style={{
+                      width: "100%",
+                      padding: "18px 30px",
+                      background: "transparent",
+                      border: "2px solid var(--luxury-gold)",
+                      color: "var(--luxury-gold)",
+                      borderRadius: "8px",
+                      fontFamily: "'Poppins', sans-serif",
+                      fontSize: "1rem",
+                      textTransform: "uppercase",
+                      letterSpacing: "2px",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      transition: "all 0.3s ease",
+                    }}
+                    whileHover={{
+                      background: "var(--luxury-gold)",
+                      color: "var(--luxury-black)",
+                      scale: 1.02,
+                      boxShadow: "0 0 30px rgba(212, 175, 55, 0.6)",
+                    }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    Register
+                  </motion.button>
+                </form>
+              </div>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
   );
 }
-
